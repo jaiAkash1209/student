@@ -3,201 +3,151 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Student Management System</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+  <title>Hostel Student Management System</title>
+  <link rel="stylesheet" href="styles.css" />
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
-
     body {
-      background: #fa0627;
-      color: #ea1a1a;
+      font-family: Arial, sans-serif;
+      padding: 20px;
     }
 
-    header {
-      background: #fbff00;
-      color: #ffea00;
-      padding: 1rem 2rem;
-      text-align: center;
-    }
-
-    .container {
-      padding: 2rem;
-    }
-
-    .dashboard {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .card {
-      background: linear-gradient(135deg, #6366f1, #818cf8);
-      color: #fff;
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      transition: 0.3s;
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
-    }
-
-    .card h3 {
-      font-size: 1.2rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .card p {
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
-
-    .erp-section h2 {
-      margin-bottom: 1rem;
-    }
-
-    .erp-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .erp-card {
-      background: #fff;
-      padding: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      position: relative;
-    }
-
-    .erp-card h4 {
-      margin-bottom: 0.5rem;
-      color: #4f46e5;
-    }
-
-    .erp-card p {
-      color: #555;
-    }
-
-    .edit-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: #4f46e5;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 0.3rem 0.6rem;
-      cursor: pointer;
-      font-size: 0.8rem;
-    }
-
-    .edit-input {
-      width: 100%;
-      margin-top: 0.5rem;
-      padding: 0.5rem;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-
-    .save-btn {
-      margin-top: 0.5rem;
-      background: #10b981;
+    h2 {
+      background-color: #444;
       color: white;
-      border: none;
-      padding: 0.4rem 0.8rem;
-      border-radius: 6px;
-      cursor: pointer;
+      padding: 10px;
+    }
+
+    section {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 15px;
+    }
+
+    .admin-only {
+      background-color: #fdd;
+      padding: 5px;
+      font-size: 12px;
+      border-left: 4px solid red;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>🎓 Student Management System Dashboard</h1>
-  </header>
+  <h1>🏨 Hostel Student Management System</h1>
 
-  <div class="container">
+  <section>
+    <h2>Total Number of Students</h2>
+    <p id="totalStudents">Loading...</p>
+  </section>
 
-    <!-- Dashboard Cards -->
-    <div class="dashboard">
-      <div class="card">
-        <h3>Total Students</h3>
-        <p>320</p>
-      </div>
-      <div class="card">
-        <h3>Active Courses</h3>
-        <p>12</p>
-      </div>
-      <div class="card">
-        <h3>Pending Fees</h3>
-        <p>$1,250</p>
-      </div>
-      <div class="card">
-        <h3>Staff Members</h3>
-        <p>24</p>
-      </div>
-    </div>
+  <section>
+    <h2>Student Details</h2>
+    <form id="studentForm">
+      <label>Student Name:</label>
+      <input type="text" name="name" required />
+      <label>Roll Number:</label>
+      <input type="text" name="roll" required />
+      <label>Room Number:</label>
+      <input type="text" name="room" required />
+      <label>Students per Room:</label>
+      <input type="number" name="room_capacity" required />
+      <div class="admin-only">Editable by Admin Only</div>
+      <button type="submit">Save Details</button>
+    </form>
+  </section>
 
-    <!-- ERP Editable Section -->
-    <div class="erp-section">
-      <h2>⚙️ ERP Configuration</h2>
-      <div class="erp-cards">
-        <div class="erp-card" data-id="1">
-          <button class="edit-btn" onclick="editCard(this)">Edit</button>
-          <h4>Department Name</h4>
-          <p class="erp-text">Computer Science</p>
-        </div>
+  <section>
+    <h2>Entry/Exit Logs</h2>
+    <form id="entryExitForm">
+      <label>Student Roll No:</label>
+      <input type="text" name="roll" required />
 
-        <div class="erp-card" data-id="2">
-          <button class="edit-btn" onclick="editCard(this)">Edit</button>
-          <h4>Fee Structure</h4>
-          <p class="erp-text">$5000 / year</p>
-        </div>
+      <label>Location:</label>
+      <select name="location" required>
+        <option>Hostel</option>
+        <option>Campus</option>
+        <option>Outstation</option>
+        <option>Visitor</option>
+        <option>Mess</option>
+      </select>
 
-        <div class="erp-card" data-id="3">
-          <button class="edit-btn" onclick="editCard(this)">Edit</button>
-          <h4>Class Timing</h4>
-          <p class="erp-text">8:00 AM - 3:00 PM</p>
-        </div>
-      </div>
-    </div>
-  </div>
+      <label>Entry/Exit:</label>
+      <select name="type" required>
+        <option>Entry</option>
+        <option>Exit</option>
+      </select>
+
+      <label>Timestamp:</label>
+      <input type="datetime-local" name="time" required />
+
+      <div class="admin-only">Faculties Only</div>
+      <button type="submit">Log</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>Mess Fee Management</h2>
+    <form id="messFeesForm">
+      <label>Roll Number:</label>
+      <input type="text" name="roll" required />
+
+      <label>Mess Fee (₹):</label>
+      <input type="number" name="fee" required />
+
+      <div class="admin-only">Editable by Admin Only</div>
+      <button type="submit">Submit</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>Food Feedback</h2>
+    <form id="feedbackForm">
+      <label>Roll Number:</label>
+      <input type="text" name="roll" required />
+
+      <label>Feedback:</label>
+      <textarea name="feedback" required></textarea>
+
+      <button type="submit">Submit Feedback</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>Barcode Scan</h2>
+    <label>Scan Student ID:</label>
+    <input type="text" id="barcodeInput" placeholder="Scan or enter barcode..." />
+
+    <div class="admin-only">Faculties Only</div>
+  </section>
 
   <script>
-    function editCard(button) {
-      const card = button.parentElement;
-      const textElement = card.querySelector('.erp-text');
-      const currentValue = textElement.innerText;
+    // Mock data and frontend-only logic
+    document.getElementById("totalStudents").textContent = "120";
 
-      // Replace text with input
-      textElement.innerHTML = `
-        <input type="text" class="edit-input" value="${currentValue}" />
-        <button class="save-btn" onclick="saveCard(this)">Save</button>
-      `;
-
-      button.style.display = 'none';
-    }
-
-    function saveCard(button) {
-      const card = button.closest('.erp-card');
-      const input = card.querySelector('.edit-input');
-      const newValue = input.value;
-
-      const textElement = card.querySelector('.erp-text');
-      textElement.innerText = newValue;
-
-      const editBtn = card.querySelector('.edit-btn');
-      editBtn.style.display = 'block';
-    }
+    // Form submit handlers (no real backend)
+    document.querySelectorAll("form").forEach(form => {
+      form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        alert("Form submitted! (Functionality requires backend)");
+      });
+    });
   </script>
 </body>
-
 </html>
