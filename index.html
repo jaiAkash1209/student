@@ -3,54 +3,70 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hostel Student Management System</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Hostel Student Management System + AI Chatbot</title>
   <style>
     body {
-  font-family: Arial, sans-serif;
-  padding: 20px;
-
-  /* Background settings */
-  background: url("k.jpg") no-repeat center center fixed;
-  background-size: cover;   /* Makes image cover the full screen */
-  color: white;             /* Text color visible on dark images */
-}
-
-
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: url("k.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+    }
     h2 {
       background-color: #444;
       color: white;
       padding: 10px;
     }
-
     section {
       border: 1px solid #ccc;
       padding: 15px;
       margin-bottom: 20px;
       border-radius: 5px;
+      background: rgba(0,0,0,0.6);
     }
-
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-
+    label { display: block; margin-top: 10px; }
     input, select, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
+      width: 100%; padding: 8px; margin-top: 5px;
     }
+    button { margin-top: 10px; padding: 10px 15px; cursor: pointer; }
 
-    button {
-      margin-top: 10px;
-      padding: 10px 15px;
+    /* Chatbot styles */
+    .chatbot-toggle {
+      position: fixed; bottom: 20px; right: 20px;
+      background: #0b93f6; color: white; border: none;
+      border-radius: 50%; width: 60px; height: 60px;
+      font-size: 24px; cursor: pointer;
     }
-
-    .admin-only {
-      background-color: #fdd;
-      padding: 5px;
-      font-size: 12px;
-      border-left: 4px solid red;
+    .chatbot-window {
+      position: fixed; bottom: 90px; right: 20px;
+      width: 320px; height: 400px;
+      background: #1e293b; color: white;
+      border-radius: 10px; display: none;
+      flex-direction: column; overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+    .chat-header {
+      background: #0b93f6; padding: 10px; font-weight: bold;
+    }
+    .chat-body {
+      flex: 1; padding: 10px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .chat-message {
+      padding: 8px 10px; border-radius: 8px; max-width: 80%;
+    }
+    .user-msg { align-self: flex-end; background: #2563eb; }
+    .bot-msg { align-self: flex-start; background: #374151; }
+    .chat-input {
+      display: flex; border-top: 1px solid #333;
+    }
+    .chat-input input {
+      flex: 1; padding: 10px; border: none;
+      outline: none; background: #111827; color: white;
+    }
+    .chat-input button {
+      background: #0b93f6; border: none; color: white;
+      padding: 10px 15px; cursor: pointer;
     }
   </style>
 </head>
@@ -60,7 +76,7 @@
 
   <section>
     <h2>Total Number of Students</h2>
-    <p id="totalStudents">Loading...</p>
+    <p id="totalStudents">0</p>
   </section>
 
   <section>
@@ -74,37 +90,7 @@
       <input type="text" name="room" required />
       <label>Students per Room:</label>
       <input type="number" name="room_capacity" required />
-      <div class="admin-only">Editable by Admin Only</div>
       <button type="submit">Save Details</button>
-    </form>
-  </section>
-
-  <section>
-    <h2>Entry/Exit Logs</h2>
-    <form id="entryExitForm">
-      <label>Student Roll No:</label>
-      <input type="text" name="roll" required />
-
-      <label>Location:</label>
-      <select name="location" required>
-        <option>Hostel</option>
-        <option>Campus</option>
-        <option>Outstation</option>
-        <option>Visitor</option>
-        <option>Mess</option>
-      </select>
-
-      <label>Entry/Exit:</label>
-      <select name="type" required>
-        <option>Entry</option>
-        <option>Exit</option>
-      </select>
-
-      <label>Timestamp:</label>
-      <input type="datetime-local" name="time" required />
-
-      <div class="admin-only">Faculties Only</div>
-      <button type="submit">Log</button>
     </form>
   </section>
 
@@ -113,48 +99,105 @@
     <form id="messFeesForm">
       <label>Roll Number:</label>
       <input type="text" name="roll" required />
-
       <label>Mess Fee (₹):</label>
       <input type="number" name="fee" required />
-
-      <div class="admin-only">Editable by Admin Only</div>
       <button type="submit">Submit</button>
     </form>
   </section>
 
-  <section>
-    <h2>Food Feedback</h2>
-    <form id="feedbackForm">
-      <label>Roll Number:</label>
-      <input type="text" name="roll" required />
+  <!-- Floating Chatbot -->
+  <button class="chatbot-toggle">💬</button>
+  <div class="chatbot-window" id="chatbot">
+    <div class="chat-header">AI Chatbot Assistant</div>
+    <div class="chat-body" id="chatBody"></div>
+    <div class="chat-input">
+      <input type="text" id="chatInput" placeholder="Ask me anything..." />
+      <button id="sendBtn">➤</button>
+    </div>
+  </div>
 
-      <label>Feedback:</label>
-      <textarea name="feedback" required></textarea>
+<script>
+  // Data storage
+  let students = JSON.parse(localStorage.getItem("students") || "[]");
+  let messFees = JSON.parse(localStorage.getItem("messFees") || "{}");
 
-      <button type="submit">Submit Feedback</button>
-    </form>
-  </section>
+  function updateTotalStudents() {
+    document.getElementById("totalStudents").textContent = students.length;
+  }
+  updateTotalStudents();
 
-  <section>
-    <h2>Barcode Scan</h2>
-    <label>Scan Student ID:</label>
-    <input type="text" id="barcodeInput" placeholder="Scan or enter barcode..." />
-
-    <div class="admin-only">Faculties Only</div>
-  </section>
-
-  <script>
-    // Mock data and frontend-only logic
-    document.getElementById("totalStudents").textContent = "120";
-
-    // Form submit handlers (no real backend)
-    document.querySelectorAll("form").forEach(form => {
-      form.addEventListener("submit", function(e) {
-        e.preventDefault();
-        alert("Form submitted! (Functionality requires backend)");
-      });
+  // Save student details
+  document.getElementById("studentForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const form = e.target;
+    students.push({
+      name: form.name.value,
+      roll: form.roll.value,
+      room: form.room.value,
+      capacity: form.room_capacity.value
     });
-  </script>
-   
+    localStorage.setItem("students", JSON.stringify(students));
+    updateTotalStudents();
+    alert("Student saved!");
+    form.reset();
+  });
+
+  // Save mess fee
+  document.getElementById("messFeesForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const form = e.target;
+    messFees[form.roll.value] = form.fee.value;
+    localStorage.setItem("messFees", JSON.stringify(messFees));
+    alert("Mess fee saved!");
+    form.reset();
+  });
+
+  // Chatbot logic
+  const toggleBtn = document.querySelector(".chatbot-toggle");
+  const chatbot = document.getElementById("chatbot");
+  const chatBody = document.getElementById("chatBody");
+  const chatInput = document.getElementById("chatInput");
+  const sendBtn = document.getElementById("sendBtn");
+
+  toggleBtn.onclick = () => {
+    chatbot.style.display = chatbot.style.display === "flex" ? "none" : "flex";
+  };
+
+  function addMessage(text, sender="bot") {
+    const div = document.createElement("div");
+    div.className = "chat-message " + (sender === "user" ? "user-msg" : "bot-msg");
+    div.textContent = text;
+    chatBody.appendChild(div);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+
+  function handleChat(input) {
+    const q = input.toLowerCase();
+    if(q.includes("students")) {
+      return "Total students: " + students.length;
+    }
+    if(q.includes("mess fee")) {
+      const roll = q.match(/\\d+/);
+      if(roll && messFees[roll[0]]) {
+        return "Mess fee for Roll " + roll[0] + " is ₹" + messFees[roll[0]];
+      }
+      return "No mess fee record found for that roll number.";
+    }
+    if(q.includes("hello") || q.includes("hi")) return "Hello! How can I help you?";
+    if(q.includes("time")) return "Current time: " + new Date().toLocaleTimeString();
+    if(q.includes("date")) return "Today is: " + new Date().toDateString();
+    if(q.includes("joke")) return "😂 Why don't programmers like nature? Too many bugs!";
+    return "I can answer about students, mess fees, time, date, and more!";
+  }
+
+  sendBtn.onclick = () => {
+    const text = chatInput.value.trim();
+    if(!text) return;
+    addMessage(text,"user");
+    const reply = handleChat(text);
+    setTimeout(()=>addMessage(reply,"bot"),500);
+    chatInput.value="";
+  };
+</script>
 </body>
 </html>
